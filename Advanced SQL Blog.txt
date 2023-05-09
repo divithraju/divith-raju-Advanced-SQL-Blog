@@ -26,6 +26,9 @@ Window functions allow you to perform calculations across a set of rows that are
 
 For example; we have a table called orders that contains the following columns: order_id, customer_id, order_date, and order_amount. You want to calculate the running total of sales for each customer, ordered by their order dates. You can use the SUM window function to do this:
 
+For example:
+
+
 SELECT order_id, customer_id, order_date, order_amount,
   SUM(order_amount) OVER (
     PARTITION BY customer_id
@@ -33,6 +36,10 @@ SELECT order_id, customer_id, order_date, order_amount,
     ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   ) AS running_total
 FROM orders;
+
+
+
+
 In this example, the SUM function is applied to the order_amount column and is partitioned by the customer_id column. This means that the running total will be calculated separately for each customer.
 
 The ORDER BY clause specifies that the order dates should be used to determine the order of the rows within each partition. This means that the running total will be calculated in the order of the customer's orders.
@@ -43,11 +50,18 @@ The result of the query will be a table that contains the same columns as the or
 
 By using Window Functions in SQL, you can perform complex calculations on your data and gain deeper insights into your business. This example demonstrates how to calculate running totals for each customer, but you can use Window Functions to perform many other types of calculations, such as calculating moving averages, ranking data, and more.
 
+
+
+
 Common Table Expressions (CTEs)
 
 CTEs allow you to define a temporary result set that can be used in subsequent SQL statements.
 
-Let’s say we have a table called employees that contains the following columns: employee_id, employee_name, department_id, and salary. You want to calculate the average salary for each department, and then find the employees whose salary is higher than their department's average salary. To do this, you can use a CTE to first calculate the average salary for each department, and then use that CTE in a second query to find the employees whose salary is higher than their department's average salary.
+Letâ€™s say we have a table called employees that contains the following columns: employee_id, employee_name, department_id, and salary. You want to calculate the average salary for each department, and then find the employees whose salary is higher than their department's average salary. To do this, you can use a CTE to first calculate the average salary for each department, and then use that CTE in a second query to find the employees whose salary is higher than their department's average salary.
+
+
+For example:
+
 
 WITH department_avg_salary AS (
   SELECT department_id, AVG(salary) AS avg_salary
@@ -55,23 +69,36 @@ WITH department_avg_salary AS (
   GROUP BY department_id
 )
 
+
+
 SELECT employee_id, employee_name, salary, department_avg_salary.avg_salary
 FROM employees
 INNER JOIN department_avg_salary ON employees.department_id = department_avg_salary.department_id
 WHERE salary > department_avg_salary.avg_salary;
+
+
+
+
 In this example, the first query defines a CTE called department_avg_salary. This CTE calculates the average salary for each department, using the AVG function and a GROUP BY clause that groups the employees by their department.
 
 The second query then uses the department_avg_salary CTE as if it were a table, joining it with the employees table on the department_id column. The result is filtered by the WHERE clause to only include employees whose salary is higher than their department's average salary.
 
-The advantage of using a CTE, in this case, is that it allows you to break down the problem into two steps: First, calculating the average salary for each department, and then selecting the employees whose salary is higher than their department’s average salary. By separating the calculation into two steps, the query is easier to read and maintain.
+The advantage of using a CTE, in this case, is that it allows you to break down the problem into two steps: First, calculating the average salary for each department, and then selecting the employees whose salary is higher than their departmentâ€™s average salary. By separating the calculation into two steps, the query is easier to read and maintain.
 
 CTEs can be used in many other situations as well, such as for recursive queries, complex joins, and more. By using CTEs, you can make your SQL queries more readable and easier to understand.
+
+
+
 
 Aggregate Functions
 
 Aggregate functions are functions that perform a calculation on a set of values and return a single value as a result. These functions allow us to perform calculations across multiple rows or columns of a table and can be used to summarize data in a meaningful way. The most common aggregate functions in SQL are SUM, AVG, MIN, MAX, and COUNT.
 
 For example, there is a table called sales that contains the following columns: sale_id, product_id, sale_date, sale_amount, and region. You want to calculate the total sales and average sales per product, as well as the top-selling product in each region. To do this, you can use Aggregate Functions to group the sales by product and region and calculate the total and average sales, as well as find the top-selling product in each region.
+
+
+For example:
+
 
 SELECT 
   product_id, 
@@ -81,6 +108,11 @@ SELECT
   RANK() OVER (PARTITION BY region ORDER BY SUM(sale_amount) DESC) AS rank
 FROM sales
 GROUP BY product_id, region;
+
+
+
+
+
 In this example, the query has got three Aggregate Functions: AVG, SUM, and RANK.
 
 The AVG function calculates the average sale amount per product and region, while the SUM function calculates the total sale amount per product and region. The GROUP BY clause groups the sales by product and region.
@@ -93,13 +125,19 @@ The advantage of using Aggregate Functions, in this case, is that they allow you
 
 Aggregate Functions can be used in many other situations as well, such as calculating minimum and maximum values, counting records, and more. By using Aggregate Functions, you can make your SQL queries more powerful and flexible.
 
+
+
+
 Pivot Tables
 
 Pivot tables are tables that summarize and aggregate data from a larger table in a way that makes it easier to analyze. It allows us to transform data from rows to columns, and display the data in a more meaningful way.
 
 Pivot tables in SQL are created using the PIVOT operator, which is used to aggregate data based on a specific column and display the results in a tabular format.
 
+
+
 For example:
+
 
 SELECT 
   customer_id, 
@@ -119,6 +157,10 @@ PIVOT (
   SUM(order_quantity)
   FOR product_id IN ([1], [2], [3], [4], [5])
 ) AS pvt;
+
+
+
+
 In above example, the query uses the PIVOT operator to pivot the data by product ID, with columns for each product and rows for each customer. The SUM function is used to calculate the total quantity of each product ordered by each customer.
 
 The subquery p is used to extract the necessary columns from the orders table. The PIVOT operator is then applied to the subquery, with the SUM function used to calculate the total quantity of each product ordered by each customer. The FOR clause specifies the pivot column (in this case, product_id), and the IN clause specifies the values to pivot on (in this case, [1], [2], [3], [4], [5]).
@@ -127,11 +169,17 @@ The result of the query is a pivot table that shows the total quantity of each p
 
 Pivot tables can be used in many other situations as well, such as summarizing sales data, analyzing survey results, and more. By using pivot tables, you can make your SQL queries more powerful and flexible.
 
+
+
+
 Subqueries
 
 Subqueries in SQL are nested queries used to retrieve data from one or more tables, and the results of the subquery are used in the main query. They can be used to filter, sort, and group data, and can be classified as single-row or multiple-row subqueries. Subqueries are enclosed in parentheses and can be used in various parts of a SQL statement such as the SELECT, FROM, WHERE, and HAVING clauses.
 
 For example; there are two tables called employees and salaries. The employees table contains the following columns: employee_id, first_name, last_name, and department_id. The salaries table contains the following columns: employee_id, salary, and salary_date. You want to find the names of the employees who have the highest salary in each department. To do this, you can use a subquery to find the maximum salary for each department, and then join the result with the employees and salaries tables to get the names of the employees who have that salary.
+
+For example:
+
 
 SELECT 
   e.first_name, 
@@ -150,17 +198,29 @@ FROM
     GROUP BY 
       department_id
   ) m ON s.department_id = m.department_id AND s.salary = m.max_salary;
+  
+  
+  
+  
+  
 The below query uses a subquery to find the maximum salary for each department. The subquery is executed first and returns a result set that contains the maximum salary for each department. The main query then joins the employees and salaries tables with the result of the subquery, to get the names of the employees who have the highest salary in each department.
 
 The INNER JOIN clause is used to join the employees and salaries tables, using the employee_id column as the join key. The subquery is joined to the main query using the department_id column, and the salary column is used to match the maximum salary for each department.
 
 The result of the query is a table that shows the names of the employees who have the highest salary in each department, along with their department ID and salary.
 
+
+
 Cross Joins
 
 Cross Joins are a type of join operation that returns the Cartesian product of two or more tables. They do not use a join condition but instead combine every row from one table with every row from the other table. The resulting table contains all possible combinations of rows from both tables. Cross joins can be useful in certain situations, such as when generating test data or when performing a calculation that requires all possible combinations of values from multiple tables. However, they can also be computationally expensive and can generate very large result sets.
 
 In below example; there are 2 tables called customers and orders. The customers table contains the following columns: customer_id, customer_name, and city. The orders table contains the following columns: order_id, customer_id, and order_date. You want to find the total number of orders placed by each customer in each city. To do this, you can use a cross join to generate a result set that combines every customer with every city, and then join the result with the orders table to get the number of orders for each combination.
+
+
+
+For example:
+
 
 SELECT 
   c.customer_id, 
@@ -181,7 +241,10 @@ WHERE
 GROUP BY 
   c.customer_id, 
   c.customer_name, 
-  c.city;
+  c.city
+  
+  
+  
 In below example, the query uses a cross join to generate a result set that combines every customer with every city. The cross join is executed first, and returns a result set that contains every combination of customer and city. The main query then joins the result of the cross join with the orders table, using a left join to ensure that all customers are included in the result even if they have not placed any orders.
 
 The WHERE clause is used to filter the result to only include rows where the customer's city matches the city in the cross join. This ensures that the result only shows the number of orders for each customer in their respective city.
@@ -190,24 +253,37 @@ The GROUP BY clause is used to group the result by customer ID, customer name, a
 
 The result of the query is a table that shows the total number of orders placed by each customer in each city.
 
+
+
+
 Temporary Tables
 
 Temporary tables in SQL are tables that are created and used for a specific purpose during the execution of a SQL statement or transaction. They are stored in memory or on disk, and are automatically dropped when the session that created them ends or when they are no longer needed. Temporary tables are often used to store intermediate results, or to break down complex queries into smaller, more manageable parts.
 
 They can be created using the CREATE TEMPORARY TABLE statement and can be manipulated like regular tables using SQL commands such as SELECT, INSERT, UPDATE, and DELETE. Temporary tables can be very useful for optimizing complex queries and improving performance, as they can help reduce the amount of data that needs to be processed at any given time.
 
-Let’s say I have a table called sales that contains the following columns: date, product, category, and sales_amount. You want to create a report that shows the total sales for each category for each month over the past year. To do this, you can use a temporary table to create a summary of the sales data for each month, and then join the temporary table with the sales table to get the total sales for each category.
+Letâ€™s say I have a table called sales that contains the following columns: date, product, category, and sales_amount. You want to create a report that shows the total sales for each category for each month over the past year. To do this, you can use a temporary table to create a summary of the sales data for each month, and then join the temporary table with the sales table to get the total sales for each category.
 
 First, you can create the temporary table using a CREATE TEMPORARY TABLE statement:
+
+For example:
+
 
 CREATE TEMPORARY TABLE monthly_sales_summary (
   month DATE,
   category VARCHAR(50),
   total_sales DECIMAL(10,2)
 );
+
+
+
 This statement creates a temporary table called monthly_sales_summary with three columns: month, category, and total_sales. The month column is of type DATE, the category column is of type VARCHAR(50), and the total_sales column is of type DECIMAL(10,2).
 
 Next, I populate the temporary table with the summary data using an INSERT INTO statement:
+
+
+For example:
+
 
 INSERT INTO monthly_sales_summary (month, category, total_sales)
 SELECT 
@@ -221,9 +297,17 @@ WHERE
 GROUP BY 
   DATE_TRUNC('month', date),
   category;
+  
+  
+  
+  
 This statement uses the DATE_TRUNC function to truncate the date column to the month level, grouping the sales data by month and category. The result of this query is inserted into the monthly_sales_summary table, which now contains a summary of the sales data for each month.
 
 Finally, I can join the temporary table with the sales table to get the total sales for each category:
+
+For example:
+
+
 
 SELECT 
   s.category, 
@@ -239,9 +323,15 @@ WHERE
 ORDER BY 
   s.category, 
   mss.month;
+  
+  
+  
 This statement joins the sales table with the monthly_sales_summary table on the category and month columns, and selects the category, month, and total_sales columns from the temporary table. The WHERE clause is used to filter the result to only include sales data from the past year, and the ORDER BY clause is used to sort the result by category and month.
 
 The result of the query is a table that shows the total sales for each category for each month over the past year.
+
+
+
 
 Materialized Views
 
@@ -252,6 +342,9 @@ This can result in significant performance improvements, especially for complex 
 For example; there is a large table called sales that contains the following columns: date, product, category, and sales_amount. You want to create a report that shows the total sales for each category for each month over the past year. However, running this query directly on the sales table would be slow, as it contains millions of rows. To speed up the query, you can create a materialized view that summarizes the sales data by month and category.
 
 To create a materialized view, you can use the CREATE MATERIALIZED VIEW statement, like this:
+
+For example:
+
 
 CREATE MATERIALIZED VIEW monthly_sales_summary AS 
 SELECT 
@@ -265,11 +358,18 @@ WHERE
 GROUP BY 
   DATE_TRUNC('month', date),
   category;
+  
+  
+  
 This statement creates a materialized view called monthly_sales_summary, which contains a summary of the sales data for each month and category. The SELECT statement is the same as the one used to create the temporary table in the previous example, but instead of using a temporary table, the result is stored in the materialized view.
 
 Materialized views are similar to tables in that they store data on disk, but they are updated automatically when the underlying data changes. You can refresh the materialized view manually using the REFRESH MATERIALIZED VIEW statement, or you can set up a scheduled refresh using a cron job or another scheduling tool.
 
 Once the materialized view has been created, you can query it like any other table:
+
+
+For example:
+
 
 SELECT 
   category, 
@@ -280,13 +380,21 @@ FROM
 ORDER BY 
   category, 
   month;
+  
+  
+  
 This statement selects the category, month, and total_sales columns from the monthly_sales_summary materialized view, and sorts the result by category and month.
 
 The advantage of using a materialized view, in this case, is that it allows you to precompute and store the summary data, reducing the amount of time it takes to run the query. Materialized views are particularly useful for reports that are run frequently and require complex calculations on large datasets. However, they do have some limitations, such as the fact that they can take up a significant amount of disk space, and may not be updated immediately when the underlying data changes.
 
 Final Thoughts
 
+
+
 Mastering advanced SQL techniques such as window functions, CTEs, aggregate functions, pivot tables, subqueries, cross joins, temporary tables, and materialized views can help you tackle complex data analysis tasks more effectively.
 
 Remember to stay up-to-date with the latest developments and use these techniques judiciously based on your specific needs and constraints. By developing your SQL skills over time, you can unlock new insights and stay ahead of the curve in a data-driven world.
+
+
+Moreover: Follow @ https://medium.com/@Divithraju
 
